@@ -8,8 +8,11 @@ class SpreadSheet:
         pass
 
     @staticmethod
-    def check_user_spreadsheet_data(dataframe, check_na=False, dropna_colwise=False, check_real_number=False,
-                                    check_positive_number=False):
+    def check_user_spreadsheet_data( dataframe
+                                   , check_na=False
+                                   , dropna_colwise=False
+                                   , check_real_number=False
+                                   , check_positive_number=False ):
         """
         Customized checks for input data (contains NA value, contains all real number, contains all positive number)
         Args:

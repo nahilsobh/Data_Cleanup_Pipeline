@@ -1,4 +1,4 @@
-import pandas
+import pandas as pd
 import utils.log_util as logger
 
 
@@ -15,19 +15,25 @@ class CheckUtil:
         Returns:
             NA
         """
+        # -----------------------------
         # checks if dataframe contains duplicate columns
+        # -----------------------------
         if check_column is True:
             dataframe_transpose = dataframe.T
             dataframe_row_dedup = dataframe_transpose[~dataframe_transpose.index.duplicated()]
-            row_count_diff = len(dataframe_transpose.index) - len(dataframe_row_dedup.index)
+            row_count_diff      = len(dataframe_transpose.index) - len(dataframe_row_dedup.index)
+
             if row_count_diff > 0:
                 return True
             return False
 
+        # -----------------------------
         # checks if dataframe contains duplicate rows
+        # -----------------------------
         if check_row is True:
             dataframe_row_dedup = dataframe[~dataframe.index.duplicated()]
-            row_count_diff = len(dataframe.index) - len(dataframe_row_dedup.index)
+            row_count_diff      = len(dataframe.index) - len(dataframe_row_dedup.index)
+
             if row_count_diff > 0:
                 return True
             return False
@@ -45,25 +51,37 @@ class CheckUtil:
             phenotype_df_pxs_trimmed: a trimmed phenotype dataframe
 
         '''
+        # -----------------------------
         # a list to store headers that has intersection between phenotype data and user spreadsheet
+        # -----------------------------
         valid_samples = []
 
+        # -----------------------------
         # loop through phenotype (phenotype x sample) to check header intersection between phenotype and spreadsheet
+        # -----------------------------
         for column in range(0, len(phenotype_df_pxs.columns)):
+            # -----------------------------
             # drops columns with NA value in phenotype dataframe
+            # -----------------------------
             phenotype_df_sxp = phenotype_df_pxs.ix[:, column].to_frame().dropna(axis=0)
-            phenotype_index = list(phenotype_df_sxp.index.values)
+            phenotype_index  = list(phenotype_df_sxp.index.values)
+
+            # -----------------------------
             # finds common headers
+            # -----------------------------
             common_headers = set(phenotype_index) & set(dataframe_header)
             cur_column_name = phenotype_df_pxs.columns[column]
+
             if not common_headers:
                 logger.logging.append(
                     "WARNING: Cannot find intersection on phenotype between user spreadsheet and "
                     "phenotype data on column: {}. Removing it now.".format(cur_column_name))
+
             elif len(common_headers) < 2:
                 logger.logging.append(
                     "WARNING: Number of samples is too small to run further tests (Pearson, t-test) "
                     "on column: {}. Removing it now.".format(cur_column_name))
+
             else:
                 valid_samples.append(phenotype_df_pxs.columns[column])
 
@@ -72,7 +90,9 @@ class CheckUtil:
                                   "that has intersection with spreadsheet data.")
             return None
 
+        # -----------------------------
         # remove the columns that doesn't contain intersections in phenotype data
+        # -----------------------------
         phenotype_df_pxs_trimmed = phenotype_df_pxs[sorted(valid_samples)]
 
         return phenotype_df_pxs_trimmed
@@ -109,12 +129,9 @@ class CheckUtil:
             False: list a and b are not same
 
         """
-        if list_a == list_b:
-            return True
-        elif sorted(list_a) == sorted(list_b):
-            return False
-        else:
-            return False
+        if          list_a  ==        list_b : return True
+        elif sorted(list_a) == sorted(list_b): return False
+        else                                 : return False
 
     @staticmethod
     def check_user_spreadsheet_data(dataframe, check_na=False, dropna_colwise=False, check_real_number=False,
@@ -131,12 +148,17 @@ class CheckUtil:
         Returns:
             dataframe: cleaned DataFrame
         """
+        # -----------------------------
         # drop NA column wise in dataframe
+        # -----------------------------
         if dropna_colwise is True:
+            # -----------------------------
             # drops column which check NA in dataframe
+            # -----------------------------
             org_column_count = dataframe.shape[1]
-            dataframe = dataframe.dropna(axis=1)
-            diff_count = org_column_count - dataframe.shape[1]
+            dataframe        = dataframe.dropna(axis=1)
+            diff_count       = org_column_count - dataframe.shape[1]
+
             if diff_count > 0:
                 logger.logging.append("INFO: Remove {} column(s) which contains NA.".format(diff_count))
 
@@ -144,19 +166,25 @@ class CheckUtil:
                 logger.logging.append("ERROR: User spreadsheet is empty after removing NA column wise.")
                 return None
 
+        # -----------------------------
         # checks if dataframe contains NA value
+        # -----------------------------
         if check_na is True:
             if dataframe.isnull().values.any():
                 logger.logging.append("ERROR: This user spreadsheet contains NaN value.")
                 return None
 
+        # -----------------------------
         # checks real number negative to positive infinite
+        # -----------------------------
         if check_real_number is True:
             if False in dataframe.applymap(lambda x: isinstance(x, (int, float))).values:
                 logger.logging.append("ERROR: Found non-numeric value in user spreadsheet.")
                 return None
 
+        # -----------------------------
         # checks if dataframe contains only non-negative number
+        # -----------------------------
         if check_positive_number is True:
             if False in dataframe.applymap(lambda x: x >= 0).values:
                 logger.logging.append("ERROR: Found negative value in user spreadsheet.")
@@ -177,9 +205,11 @@ class CheckUtil:
             phenotype_df_pxs: cleaned phenotype data
 
         """
+        # -----------------------------
         # defines the default values that can exist in phenotype data
+        # -----------------------------
         if correlation_measure == 't_test':
-            list_values = pandas.unique(phenotype_df_pxs.values.ravel())
+            list_values = pd.unique(phenotype_df_pxs.values.ravel())
             if len(list_values) < 2:
                 logger.logging.append(
                     "ERROR: t_test requests at least two categories in your phenotype dataset. "
@@ -209,5 +239,3 @@ class CheckUtil:
                 return None
 
         return phenotype_df_pxs
-
-
