@@ -21,7 +21,7 @@ class Checker:
         """
         Customized checks for input data (contains NA value, contains all real number, contains all positive number)
         Args:
-            dataframe: input DataFrame to be checked
+            dataframe: input DataFrame to be checked.
             check_na: check NA in DataFrame
             dropna_colwise: drop column which contains NA
             check_real_number: check only real number exists in DataFrame
