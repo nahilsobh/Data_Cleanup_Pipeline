@@ -15,6 +15,7 @@ from   utils.spreadsheet         import SpreadSheet
 
 class Pipelines:
     def __init__(self, run_parameters):
+
         self.run_parameters        = run_parameters
 
         self.user_spreadsheet_df   = IOUtil.load_data_file(self.run_parameters['spreadsheet_name_full_path']) \
